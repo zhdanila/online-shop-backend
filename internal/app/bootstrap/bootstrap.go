@@ -11,7 +11,7 @@ type Bootstrap struct {
 }
 
 func Website() {
-	cfg, err := app.NewConfig()
+	_, err := app.NewConfig()
 	if err != nil {
 		panic(err)
 	}
