@@ -1,43 +1,27 @@
 package server
 
 import (
+	"context"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
-	"online-shop-backend/internal/app"
-	"strings"
+	"net/http"
 )
 
-type EmptyResponse = struct{}
-
 type Server struct {
-	*echo.Echo
-	port string
+	srv *http.Server
 }
 
-func (s *Server) GetPort() string {
-	port := s.port
-	if port == "" {
-		return ":8080"
+func (s *Server) Run(port string, handler http.Handler) error {
+	s.srv = &http.Server{
+		Addr:    ":" + port,
+		Handler: handler,
 	}
-	if !strings.HasPrefix(port, ":") {
-		port = ":" + port
-	}
-	return port
+
+	zap.L().Info(fmt.Sprintf("server started on %s port\n", port))
+
+	return s.srv.ListenAndServe()
 }
 
-func NewServer(cnf *app.Config) *Server {
-	middleware.DefaultRecoverConfig.LogErrorFunc = func(c echo.Context, err error, stack []byte) error {
-		zap.L().Error(fmt.Sprintf("Server servers panic for host: %s; recovered: %v\n%s", c.Path(), err, string(stack)))
-		return nil
-	}
-
-	server := echo.New()
-	server.Use(middleware.RequestID())
-
-	return &Server{
-		server,
-		cnf.GetPort(),
-	}
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.srv.Shutdown(ctx)
 }

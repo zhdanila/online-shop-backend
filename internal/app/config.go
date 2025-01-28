@@ -8,6 +8,14 @@ import (
 
 type Config struct {
 	HTTPPort string `mapstructure:"HTTP_PORT" validate:"required"`
+
+	// Database configuration
+	DBHost     string `mapstructure:"DB_HOST" validate:"required"`
+	DBPort     string `mapstructure:"DB_PORT" validate:"required"`
+	DBUsername string `mapstructure:"DB_USERNAME" validate:"required"`
+	DBName     string `mapstructure:"DB_NAME" validate:"required"`
+	DBSSLMode  string `mapstructure:"DB_SSLMODE" validate:"required"`
+	DBPassword string `mapstructure:"DB_PASSWORD" validate:"required"`
 }
 
 func (cnf *Config) GetPort() string {

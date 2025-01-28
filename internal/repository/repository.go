@@ -21,7 +21,7 @@ type Order interface {
 type Seller interface {
 }
 
-func NewService(db *sqlx.DB) *Repository {
+func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Buyer:  NewBuyerRepository(db),
 		Item:   NewItemRepository(db),
