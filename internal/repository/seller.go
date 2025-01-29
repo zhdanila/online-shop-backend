@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"online-shop-backend/internal/domain"
+	"strings"
 )
 
 const SellerTable = "sellers"
@@ -23,7 +24,7 @@ func (s SellerRepository) CreateSeller(data domain.Seller) error {
 	return nil
 }
 
-func (s SellerRepository) GetSeller(id string) (domain.Seller, error) {
+func (s SellerRepository) GetSeller(id int) (domain.Seller, error) {
 	var seller domain.Seller
 	query := fmt.Sprintf("SELECT id, name, phone, created_at FROM %s WHERE id = $1", SellerTable)
 
@@ -35,10 +36,30 @@ func (s SellerRepository) GetSeller(id string) (domain.Seller, error) {
 	return seller, nil
 }
 
-func (s SellerRepository) UpdateSeller(id string, data domain.Seller) error {
-	query := fmt.Sprintf("UPDATE %s SET name = $1, phone = $2 WHERE id = $3", SellerTable)
+func (s SellerRepository) UpdateSeller(id int, data domain.Seller) error {
+	var setClauses []string
+	var params []interface{}
 
-	_, err := s.db.Exec(query, data.Name, data.Phone, id)
+	if data.Name != "" {
+		setClauses = append(setClauses, fmt.Sprintf("name = $%d", len(params)+1))
+		params = append(params, data.Name)
+	}
+
+	if data.Phone != "" {
+		setClauses = append(setClauses, fmt.Sprintf("phone = $%d", len(params)+1))
+		params = append(params, data.Phone)
+	}
+
+	if len(setClauses) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", SellerTable,
+		strings.Join(setClauses, ", "), len(params)+1)
+
+	params = append(params, id)
+
+	_, err := s.db.Exec(query, params...)
 	if err != nil {
 		return fmt.Errorf("could not update seller: %v", err)
 	}
@@ -46,7 +67,7 @@ func (s SellerRepository) UpdateSeller(id string, data domain.Seller) error {
 	return nil
 }
 
-func (s SellerRepository) DeleteSeller(id string) error {
+func (s SellerRepository) DeleteSeller(id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", SellerTable)
 
 	_, err := s.db.Exec(query, id)

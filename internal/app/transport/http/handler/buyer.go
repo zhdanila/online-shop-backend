@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"online-shop-backend/internal/domain"
+	buyer2 "online-shop-backend/internal/service/buyer"
 	"online-shop-backend/pkg/response"
 )
 
@@ -24,7 +25,12 @@ func (h *Handler) createBuyer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = h.services.Buyer.CreateBuyer(buyer); err != nil {
+	req := &buyer2.CreateBuyerRequest{
+		Name:  buyer.Name,
+		Phone: buyer.Phone,
+	}
+
+	if _, err = h.services.Buyer.CreateBuyer(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -37,24 +43,28 @@ func (h *Handler) createBuyer(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) getBuyer(w http.ResponseWriter, r *http.Request) {
 	var (
-		err   error
-		id    string
-		buyer domain.Buyer
+		err error
+		id  int
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "buyer id not found in context")
 		return
 	}
 
-	if buyer, err = h.services.Buyer.GetBuyer(id); err != nil {
+	req := &buyer2.GetBuyerRequest{
+		Id: id,
+	}
+
+	resp, err := h.services.Buyer.GetBuyer(req)
+	if err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(buyer); err != nil {
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}
 }
@@ -62,11 +72,11 @@ func (h *Handler) getBuyer(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) updateBuyer(w http.ResponseWriter, r *http.Request) {
 	var (
 		err   error
-		id    string
+		id    int
 		buyer domain.Buyer
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "buyer ID not found in context")
 		return
@@ -82,7 +92,13 @@ func (h *Handler) updateBuyer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = h.services.Buyer.UpdateBuyer(id, buyer); err != nil {
+	req := &buyer2.UpdateBuyerRequest{
+		Id:    id,
+		Name:  "",
+		Phone: "",
+	}
+
+	if _, err = h.services.Buyer.UpdateBuyer(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -96,16 +112,18 @@ func (h *Handler) updateBuyer(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) deleteBuyer(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		id  string
+		id  int
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "buyer ID not found in context")
 		return
 	}
 
-	if err = h.services.Buyer.DeleteBuyer(id); err != nil {
+	req := &buyer2.DeleteBuyerRequest{Id: id}
+
+	if _, err = h.services.Buyer.DeleteBuyer(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -23,7 +23,7 @@ func (r *ItemRepository) CreateItem(data domain.Item) error {
 	return nil
 }
 
-func (r *ItemRepository) GetItem(id string) (domain.Item, error) {
+func (r *ItemRepository) GetItem(id int) (domain.Item, error) {
 	var item domain.Item
 	query := fmt.Sprintf("SELECT id, seller_id, name, description, price, created_at FROM %s WHERE id = $1", ItemTable)
 
@@ -35,7 +35,7 @@ func (r *ItemRepository) GetItem(id string) (domain.Item, error) {
 	return item, nil
 }
 
-func (r *ItemRepository) UpdateItem(id string, data domain.Item) error {
+func (r *ItemRepository) UpdateItem(id int, data domain.Item) error {
 	query := fmt.Sprintf("UPDATE %s SET seller_id = $1, name = $2, description = $3, price = $4 WHERE id = $5", ItemTable)
 
 	_, err := r.db.Exec(query, data.SellerID, data.Name, data.Description, data.Price, id)
@@ -46,7 +46,7 @@ func (r *ItemRepository) UpdateItem(id string, data domain.Item) error {
 	return nil
 }
 
-func (r *ItemRepository) DeleteItem(id string) error {
+func (r *ItemRepository) DeleteItem(id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", ItemTable)
 
 	_, err := r.db.Exec(query, id)

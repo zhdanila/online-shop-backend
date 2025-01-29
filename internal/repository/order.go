@@ -43,7 +43,7 @@ func (r *OrderRepository) CreateOrder(order domain.Order) error {
 	return nil
 }
 
-func (r *OrderRepository) GetOrder(id string) (domain.Order, error) {
+func (r *OrderRepository) GetOrder(id int) (domain.Order, error) {
 	var order domain.Order
 	query := fmt.Sprintf("SELECT id, buyer_id, total_price, created_at FROM %s WHERE id = $1", OrderTable)
 
@@ -65,7 +65,7 @@ func (r *OrderRepository) ListOrders() ([]domain.Order, error) {
 	return orders, nil
 }
 
-func (r *OrderRepository) UpdateOrder(id string, order domain.Order) error {
+func (r *OrderRepository) UpdateOrder(id int, order domain.Order) error {
 	query := fmt.Sprintf("UPDATE %s SET buyer_id = $1, total_price = $2 WHERE id = $3", OrderTable)
 
 	_, err := r.db.Exec(query, order.BuyerID, order.TotalPrice, id)
@@ -75,7 +75,7 @@ func (r *OrderRepository) UpdateOrder(id string, order domain.Order) error {
 	return nil
 }
 
-func (r *OrderRepository) DeleteOrder(id string) error {
+func (r *OrderRepository) DeleteOrder(id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", OrderTable)
 
 	_, err := r.db.Exec(query, id)

@@ -22,35 +22,28 @@ func NewHandler(services *service.Service, validate *validator.Validate) *Handle
 func (h *Handler) InitRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	secureMux := http.NewServeMux()
+	mux.Handle("POST /seller", middleware.BasicAuth(http.HandlerFunc(h.createSeller)))
+	mux.Handle("GET /seller/{id}", middleware.BasicAuth(http.HandlerFunc(h.getSeller)))
+	mux.Handle("PUT /seller/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateSeller)))
+	mux.Handle("DELETE /seller/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteSeller)))
 
-	mux.Handle("/seller", middleware.BasicAuth(secureMux))
-	mux.Handle("/item", middleware.BasicAuth(secureMux))
-	mux.Handle("/buyer", middleware.BasicAuth(secureMux))
-	mux.Handle("/order", middleware.BasicAuth(secureMux))
+	mux.Handle("POST /item", middleware.BasicAuth(http.HandlerFunc(h.createItem)))
+	mux.Handle("GET /item/{id}/333", middleware.BasicAuth(http.HandlerFunc(h.getItem)))
+	mux.Handle("PUT /item/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateItem)))
+	mux.Handle("DELETE /item/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteItem)))
 
-	secureMux.Handle("POST /seller", http.HandlerFunc(h.createSeller))
-	secureMux.Handle("GET /seller/{id}", http.HandlerFunc(h.getSeller))
-	secureMux.Handle("PUT /seller/{id}", http.HandlerFunc(h.updateSeller))
-	secureMux.Handle("DELETE /seller/{id}", http.HandlerFunc(h.deleteSeller))
+	mux.Handle("POST /buyer", middleware.BasicAuth(http.HandlerFunc(h.createBuyer)))
+	mux.Handle("GET /buyer/{id}", middleware.BasicAuth(http.HandlerFunc(h.getBuyer)))
+	mux.Handle("PUT /buyer/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateBuyer)))
+	mux.Handle("DELETE /buyer/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteBuyer)))
 
-	secureMux.Handle("POST /item", http.HandlerFunc(h.createItem))
-	secureMux.Handle("GET /item/{id}", http.HandlerFunc(h.getItem))
-	secureMux.Handle("PUT /item/{id}", http.HandlerFunc(h.updateItem))
-	secureMux.Handle("DELETE /item/{id}", http.HandlerFunc(h.deleteItem))
-
-	secureMux.Handle("POST /buyer", http.HandlerFunc(h.createBuyer))
-	secureMux.Handle("GET /buyer/{id}", http.HandlerFunc(h.getBuyer))
-	secureMux.Handle("PUT /buyer/{id}", http.HandlerFunc(h.updateBuyer))
-	secureMux.Handle("DELETE /buyer/{id}", http.HandlerFunc(h.deleteBuyer))
-
-	secureMux.Handle("POST /order", http.HandlerFunc(h.createOrder))
-	secureMux.Handle("GET /order/{id}", http.HandlerFunc(h.getOrder))
-	secureMux.Handle("GET /order", http.HandlerFunc(h.listOrders))
-	secureMux.Handle("PUT /order/{id}", http.HandlerFunc(h.updateOrder))
-	secureMux.Handle("DELETE /order/{id}", http.HandlerFunc(h.deleteOrder))
-	secureMux.Handle("POST /order/{id}", http.HandlerFunc(h.deleteOrder))
-	secureMux.Handle("POST /order/item", http.HandlerFunc(h.addItemToOrder))
+	mux.Handle("POST /order", middleware.BasicAuth(http.HandlerFunc(h.createOrder)))
+	mux.Handle("GET /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.getOrder)))
+	mux.Handle("GET /order", middleware.BasicAuth(http.HandlerFunc(h.listOrders)))
+	mux.Handle("PUT /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateOrder)))
+	mux.Handle("DELETE /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteOrder)))
+	mux.Handle("POST /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteOrder)))
+	mux.Handle("POST /order/item", middleware.BasicAuth(http.HandlerFunc(h.addItemToOrder)))
 
 	return mux
 }

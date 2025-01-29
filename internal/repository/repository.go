@@ -14,32 +14,32 @@ type Repository struct {
 
 type Buyer interface {
 	CreateBuyer(data domain.Buyer) error
-	GetBuyer(id string) (domain.Buyer, error)
-	UpdateBuyer(id string, data domain.Buyer) error
-	DeleteBuyer(id string) error
+	GetBuyer(id int) (domain.Buyer, error)
+	UpdateBuyer(id int, data domain.Buyer) error
+	DeleteBuyer(id int) error
 }
 
 type Item interface {
 	CreateItem(data domain.Item) error
-	GetItem(id string) (domain.Item, error)
-	UpdateItem(id string, data domain.Item) error
-	DeleteItem(id string) error
+	GetItem(id int) (domain.Item, error)
+	UpdateItem(id int, data domain.Item) error
+	DeleteItem(id int) error
 }
 
 type Order interface {
 	CreateOrder(data domain.Order) error
-	GetOrder(id string) (domain.Order, error)
+	GetOrder(id int) (domain.Order, error)
 	ListOrders() ([]domain.Order, error)
-	UpdateOrder(id string, data domain.Order) error
-	DeleteOrder(id string) error
+	UpdateOrder(id int, data domain.Order) error
+	DeleteOrder(id int) error
 	AddItemToOrder(item domain.OrderItems) error
 }
 
 type Seller interface {
 	CreateSeller(data domain.Seller) error
-	GetSeller(id string) (domain.Seller, error)
-	UpdateSeller(id string, data domain.Seller) error
-	DeleteSeller(id string) error
+	GetSeller(id int) (domain.Seller, error)
+	UpdateSeller(id int, data domain.Seller) error
+	DeleteSeller(id int) error
 }
 
 func NewRepository(db *sqlx.DB) *Repository {

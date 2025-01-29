@@ -38,11 +38,11 @@ func (h *Handler) createItem(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getItem(w http.ResponseWriter, r *http.Request) {
 	var (
 		err  error
-		id   string
+		id   int
 		item domain.Item
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "item id not found in context")
 		return
@@ -62,11 +62,11 @@ func (h *Handler) getItem(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 	var (
 		err  error
-		id   string
+		id   int
 		item domain.Item
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "item ID not found in context")
 		return
@@ -96,10 +96,10 @@ func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) deleteItem(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		id  string
+		id  int
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "item ID not found in context")
 		return

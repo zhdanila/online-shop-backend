@@ -4,7 +4,6 @@ import (
 	"errors"
 	"online-shop-backend/internal/domain"
 	"online-shop-backend/internal/repository"
-	"strconv"
 )
 
 type Service struct {
@@ -29,7 +28,7 @@ func (s *Service) CreateOrder(data domain.Order) error {
 	return nil
 }
 
-func (s *Service) GetOrder(id string) (domain.Order, error) {
+func (s *Service) GetOrder(id int) (domain.Order, error) {
 	order, err := s.repo.GetOrder(id)
 	if err != nil {
 		return domain.Order{}, err
@@ -45,20 +44,20 @@ func (s *Service) ListOrders() ([]domain.Order, error) {
 	return orders, nil
 }
 
-func (s *Service) UpdateOrder(id string, data domain.Order) error {
+func (s *Service) UpdateOrder(id int, data domain.Order) error {
 	if err := s.repo.UpdateOrder(id, data); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Service) DeleteOrder(id string) error {
+func (s *Service) DeleteOrder(id int) error {
 	order, err := s.repo.GetOrder(id)
 	if err != nil {
 		return errors.New("order not found")
 	}
 
-	if err := s.repo.DeleteOrder(strconv.Itoa(order.ID)); err != nil {
+	if err := s.repo.DeleteOrder(order.ID); err != nil {
 		return err
 	}
 	return nil

@@ -38,11 +38,11 @@ func (h *Handler) createOrder(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) getOrder(w http.ResponseWriter, r *http.Request) {
 	var (
 		err   error
-		id    string
+		id    int
 		order domain.Order
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "order id not found in context")
 		return
@@ -79,11 +79,11 @@ func (h *Handler) listOrders(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) updateOrder(w http.ResponseWriter, r *http.Request) {
 	var (
 		err   error
-		id    string
+		id    int
 		order domain.Order
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "order ID not found in context")
 		return
@@ -113,10 +113,10 @@ func (h *Handler) updateOrder(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) deleteOrder(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		id  string
+		id  int
 	)
 
-	id, ok := r.Context().Value("id").(string)
+	id, ok := r.Context().Value("id").(int)
 	if !ok {
 		response.NewErrorResponse(w, http.StatusBadRequest, "order ID not found in context")
 		return

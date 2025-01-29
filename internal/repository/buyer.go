@@ -23,7 +23,7 @@ func (b BuyerRepository) CreateBuyer(data domain.Buyer) error {
 	return nil
 }
 
-func (b BuyerRepository) GetBuyer(id string) (domain.Buyer, error) {
+func (b BuyerRepository) GetBuyer(id int) (domain.Buyer, error) {
 	var buyer domain.Buyer
 	query := fmt.Sprintf("SELECT id, name, phone, created_at FROM %s WHERE id = $1", BuyerTable)
 
@@ -35,7 +35,7 @@ func (b BuyerRepository) GetBuyer(id string) (domain.Buyer, error) {
 	return buyer, nil
 }
 
-func (b BuyerRepository) UpdateBuyer(id string, data domain.Buyer) error {
+func (b BuyerRepository) UpdateBuyer(id int, data domain.Buyer) error {
 	query := fmt.Sprintf("UPDATE %s SET name = $1, phone = $2 WHERE id = $3", BuyerTable)
 
 	_, err := b.db.Exec(query, data.Name, data.Phone, id)
@@ -46,7 +46,7 @@ func (b BuyerRepository) UpdateBuyer(id string, data domain.Buyer) error {
 	return nil
 }
 
-func (b BuyerRepository) DeleteBuyer(id string) error {
+func (b BuyerRepository) DeleteBuyer(id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", BuyerTable)
 
 	_, err := b.db.Exec(query, id)

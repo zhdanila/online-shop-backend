@@ -13,15 +13,15 @@ func (s Service) CreateItem(data domain.Item) error {
 	return s.repo.CreateItem(data)
 }
 
-func (s Service) GetItem(id string) (domain.Item, error) {
+func (s Service) GetItem(id int) (domain.Item, error) {
 	return s.repo.GetItem(id)
 }
 
-func (s Service) UpdateItem(id string, data domain.Item) error {
+func (s Service) UpdateItem(id int, data domain.Item) error {
 	return s.repo.UpdateItem(id, data)
 }
 
-func (s Service) DeleteItem(id string) error {
+func (s Service) DeleteItem(id int) error {
 	return s.repo.DeleteItem(id)
 }
 
