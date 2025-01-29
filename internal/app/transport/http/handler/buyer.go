@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"online-shop-backend/internal/domain"
-	"online-shop-backend/pkg"
+	"online-shop-backend/pkg/response"
 )
 
 func (h *Handler) createBuyer(w http.ResponseWriter, r *http.Request) {
@@ -15,17 +15,17 @@ func (h *Handler) createBuyer(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err = json.NewDecoder(r.Body).Decode(&buyer); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.validator.Struct(buyer); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.services.Buyer.CreateBuyer(buyer); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -44,12 +44,12 @@ func (h *Handler) getBuyer(w http.ResponseWriter, r *http.Request) {
 
 	id, ok := r.Context().Value("id").(string)
 	if !ok {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, "buyer id not found in context")
+		response.NewErrorResponse(w, http.StatusBadRequest, "buyer id not found in context")
 		return
 	}
 
 	if buyer, err = h.services.Buyer.GetBuyer(id); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -68,22 +68,22 @@ func (h *Handler) updateBuyer(w http.ResponseWriter, r *http.Request) {
 
 	id, ok := r.Context().Value("id").(string)
 	if !ok {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, "buyer ID not found in context")
+		response.NewErrorResponse(w, http.StatusBadRequest, "buyer ID not found in context")
 		return
 	}
 
 	if err = json.NewDecoder(r.Body).Decode(&buyer); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.validator.Struct(buyer); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.services.Buyer.UpdateBuyer(id, buyer); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -101,12 +101,12 @@ func (h *Handler) deleteBuyer(w http.ResponseWriter, r *http.Request) {
 
 	id, ok := r.Context().Value("id").(string)
 	if !ok {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, "buyer ID not found in context")
+		response.NewErrorResponse(w, http.StatusBadRequest, "buyer ID not found in context")
 		return
 	}
 
 	if err = h.services.Buyer.DeleteBuyer(id); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

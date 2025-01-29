@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"online-shop-backend/internal/domain"
-	"online-shop-backend/pkg"
+	"online-shop-backend/pkg/response"
 )
 
 func (h *Handler) createSeller(w http.ResponseWriter, r *http.Request) {
@@ -15,17 +15,17 @@ func (h *Handler) createSeller(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err = json.NewDecoder(r.Body).Decode(&user); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.validator.Struct(user); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.services.Seller.CreateSeller(user); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -45,7 +45,7 @@ func (h *Handler) getSeller(w http.ResponseWriter, r *http.Request) {
 	id = r.PathValue("seller_id")
 
 	if seller, err = h.services.Seller.GetSeller(id); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -65,17 +65,17 @@ func (h *Handler) updateSeller(w http.ResponseWriter, r *http.Request) {
 	id = r.PathValue("id")
 
 	if err = json.NewDecoder(r.Body).Decode(&user); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.validator.Struct(user); err != nil {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err = h.services.Seller.UpdateSeller(id, user); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -94,7 +94,7 @@ func (h *Handler) deleteSeller(w http.ResponseWriter, r *http.Request) {
 	id = r.PathValue("id")
 
 	if err = h.services.Seller.DeleteSeller(id); err != nil {
-		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

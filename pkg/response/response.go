@@ -1,4 +1,4 @@
-package pkg
+package response
 
 import (
 	"go.uber.org/zap"

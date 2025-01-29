@@ -32,6 +32,7 @@ type Order interface {
 	ListOrders() ([]domain.Order, error)
 	UpdateOrder(id string, data domain.Order) error
 	DeleteOrder(id string) error
+	AddItemToOrder(item domain.OrderItems) error
 }
 
 type Seller interface {

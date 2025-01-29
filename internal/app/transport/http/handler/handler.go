@@ -49,6 +49,8 @@ func (h *Handler) InitRoutes() *http.ServeMux {
 	secureMux.Handle("GET /order", http.HandlerFunc(h.listOrders))
 	secureMux.Handle("PUT /order/{id}", http.HandlerFunc(h.updateOrder))
 	secureMux.Handle("DELETE /order/{id}", http.HandlerFunc(h.deleteOrder))
+	secureMux.Handle("POST /order/{id}", http.HandlerFunc(h.deleteOrder))
+	secureMux.Handle("POST /order/item", http.HandlerFunc(h.addItemToOrder))
 
 	return mux
 }
