@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"online-shop-backend/internal/domain"
+	"online-shop-backend/internal/service/seller"
 	"online-shop-backend/pkg/response"
+	"strconv"
 )
 
 func (h *Handler) createSeller(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +26,12 @@ func (h *Handler) createSeller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = h.services.Seller.CreateSeller(user); err != nil {
+	req := &seller.CreateSellerRequest{
+		Name:  user.Name,
+		Phone: user.Phone,
+	}
+
+	if _, err = h.services.Seller.CreateSeller(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -37,52 +44,81 @@ func (h *Handler) createSeller(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) getSeller(w http.ResponseWriter, r *http.Request) {
 	var (
-		err    error
-		id     int
-		seller domain.Seller
+		err error
 	)
 
-	id, ok := r.Context().Value("id").(int)
-	if !ok {
-		response.NewErrorResponse(w, http.StatusBadRequest, "seller ID not found in context")
+	id := r.PathValue("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if seller, err = h.services.Seller.GetSeller(id); err != nil {
+	req := &seller.GetSellerRequest{
+		Id: intId,
+	}
+
+	resp, err := h.services.Seller.GetSeller(req)
+	if err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(seller); err != nil {
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+	}
+}
+
+func (h *Handler) listSellers(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+	)
+
+	req := &seller.ListSellersRequest{}
+
+	resp, err := h.services.Seller.ListSellers(req)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}
 }
 
 func (h *Handler) updateSeller(w http.ResponseWriter, r *http.Request) {
 	var (
-		err  error
-		id   int
-		user domain.Seller
+		err       error
+		sellerEnt domain.Seller
 	)
 
-	id, ok := r.Context().Value("id").(int)
-	if !ok {
-		response.NewErrorResponse(w, http.StatusBadRequest, "seller ID not found in context")
-		return
-	}
-
-	if err = json.NewDecoder(r.Body).Decode(&user); err != nil {
+	id := r.PathValue("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(user); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&sellerEnt); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.services.Seller.UpdateSeller(id, user); err != nil {
+	if err = h.validator.Struct(sellerEnt); err != nil {
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	req := &seller.UpdateSellerRequest{
+		Id:    intId,
+		Name:  sellerEnt.Name,
+		Phone: sellerEnt.Phone,
+	}
+
+	if _, err = h.services.Seller.UpdateSeller(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -96,16 +132,20 @@ func (h *Handler) updateSeller(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) deleteSeller(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		id  int
 	)
 
-	id, ok := r.Context().Value("id").(int)
-	if !ok {
-		response.NewErrorResponse(w, http.StatusBadRequest, "seller ID not found in context")
+	id := r.PathValue("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.services.Seller.DeleteSeller(id); err != nil {
+	req := &seller.DeleteSellerRequest{
+		Id: intId,
+	}
+
+	if _, err = h.services.Seller.DeleteSeller(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
 

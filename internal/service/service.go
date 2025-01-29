@@ -1,7 +1,6 @@
 package service
 
 import (
-	"online-shop-backend/internal/domain"
 	"online-shop-backend/internal/repository"
 	"online-shop-backend/internal/service/buyer"
 	"online-shop-backend/internal/service/item"
@@ -19,31 +18,34 @@ type Service struct {
 type Buyer interface {
 	CreateBuyer(req *buyer.CreateBuyerRequest) (*buyer.CreateBuyerResponse, error)
 	GetBuyer(req *buyer.GetBuyerRequest) (*buyer.GetBuyerResponse, error)
+	ListBuyers(req *buyer.ListBuyersRequest) (*buyer.ListBuyersResponse, error)
 	UpdateBuyer(req *buyer.UpdateBuyerRequest) (*buyer.UpdateBuyerResponse, error)
 	DeleteBuyer(req *buyer.DeleteBuyerRequest) (*buyer.DeleteBuyerResponse, error)
 }
 
 type Item interface {
-	CreateItem(data domain.Item) error
-	GetItem(id int) (domain.Item, error)
-	UpdateItem(id int, data domain.Item) error
-	DeleteItem(id int) error
+	CreateItem(req *item.CreateItemRequest) (*item.CreateItemResponse, error)
+	GetItem(req *item.GetItemRequest) (*item.GetItemResponse, error)
+	ListItems(req *item.ListItemsRequest) (*item.ListItemsResponse, error)
+	UpdateItem(req *item.UpdateItemRequest) (*item.UpdateItemResponse, error)
+	DeleteItem(req *item.DeleteItemRequest) (*item.DeleteItemResponse, error)
 }
 
 type Order interface {
-	CreateOrder(data domain.Order) error
-	GetOrder(id int) (domain.Order, error)
-	ListOrders() ([]domain.Order, error)
-	UpdateOrder(id int, data domain.Order) error
-	DeleteOrder(id int) error
-	AddItemToOrder(item domain.OrderItems) error
+	CreateOrder(req *order.CreateOrderRequest) (*order.CreateOrderResponse, error)
+	GetOrder(req *order.GetOrderRequest) (*order.GetOrderResponse, error)
+	ListOrders(req *order.ListOrderRequest) (*order.ListOrdersResponse, error)
+	UpdateOrder(req *order.UpdateOrderRequest) (*order.UpdateOrderResponse, error)
+	DeleteOrder(req *order.DeleteOrderRequest) (*order.DeleteOrderResponse, error)
+	AddItemToOrder(req *order.AddItemToOrderRequest) (*order.AddItemToOrderResponse, error)
 }
 
 type Seller interface {
-	CreateSeller(data domain.Seller) error
-	GetSeller(id int) (domain.Seller, error)
-	UpdateSeller(id int, data domain.Seller) error
-	DeleteSeller(id int) error
+	CreateSeller(req *seller.CreateSellerRequest) (*seller.CreateSellerResponse, error)
+	GetSeller(req *seller.GetSellerRequest) (*seller.GetSellerResponse, error)
+	ListSellers(req *seller.ListSellersRequest) (*seller.ListSellersResponse, error)
+	UpdateSeller(req *seller.UpdateSellerRequest) (*seller.UpdateSellerResponse, error)
+	DeleteSeller(req *seller.DeleteSellerRequest) (*seller.DeleteSellerResponse, error)
 }
 
 func NewService(repos *repository.Repository) *Service {

@@ -10,57 +10,85 @@ type Service struct {
 	repo repository.Order
 }
 
-func (s *Service) AddItemToOrder(item domain.OrderItems) error {
-	if item.Quantity < 1 {
-		return errors.New("quantity must be at least 1")
+func (s *Service) AddItemToOrder(req *AddItemToOrderRequest) (*AddItemToOrderResponse, error) {
+	if req.Quantity < 1 {
+		return nil, errors.New("quantity must be at least 1")
 	}
 
-	if err := s.repo.AddItemToOrder(item); err != nil {
-		return err
+	if err := s.repo.AddItemToOrder(domain.OrderItems{
+		OrderID:  req.OrderID,
+		ItemID:   req.ItemID,
+		Quantity: req.Quantity,
+		Price:    req.Price,
+	}); err != nil {
+		return nil, err
 	}
-	return nil
+	return &AddItemToOrderResponse{}, nil
 }
 
-func (s *Service) CreateOrder(data domain.Order) error {
-	if err := s.repo.CreateOrder(data); err != nil {
-		return err
+func (s *Service) CreateOrder(req *CreateOrderRequest) (*CreateOrderResponse, error) {
+	if err := s.repo.CreateOrder(domain.Order{
+		BuyerID:    req.BuyerID,
+		TotalPrice: req.TotalPrice,
+	}); err != nil {
+		return nil, err
 	}
-	return nil
+	return &CreateOrderResponse{}, nil
 }
 
-func (s *Service) GetOrder(id int) (domain.Order, error) {
-	order, err := s.repo.GetOrder(id)
-	if err != nil {
-		return domain.Order{}, err
-	}
-	return order, nil
-}
-
-func (s *Service) ListOrders() ([]domain.Order, error) {
-	orders, err := s.repo.ListOrders()
+func (s *Service) GetOrder(req *GetOrderRequest) (*GetOrderResponse, error) {
+	order, err := s.repo.GetOrder(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	return orders, nil
+	resp := &GetOrderResponse{Order: Order{
+		ID:         order.ID,
+		BuyerID:    order.BuyerID,
+		TotalPrice: order.TotalPrice,
+		CreatedAt:  order.CreatedAt,
+	}}
+
+	return resp, nil
 }
 
-func (s *Service) UpdateOrder(id int, data domain.Order) error {
-	if err := s.repo.UpdateOrder(id, data); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) DeleteOrder(id int) error {
-	order, err := s.repo.GetOrder(id)
+func (s *Service) ListOrders(req *ListOrderRequest) (*ListOrdersResponse, error) {
+	res, err := s.repo.ListOrders()
 	if err != nil {
-		return errors.New("order not found")
+		return nil, err
 	}
 
-	if err := s.repo.DeleteOrder(order.ID); err != nil {
-		return err
+	resp := &ListOrdersResponse{
+		Orders: make([]Order, len(res)),
 	}
-	return nil
+	for _, item := range res {
+		resp.Orders = append(resp.Orders, Order{
+			ID:         item.ID,
+			BuyerID:    item.BuyerID,
+			TotalPrice: item.TotalPrice,
+			CreatedAt:  item.CreatedAt,
+		})
+	}
+
+	return resp, nil
+}
+
+func (s *Service) UpdateOrder(req *UpdateOrderRequest) (*UpdateOrderResponse, error) {
+	if err := s.repo.UpdateOrder(req.Id, domain.Order{
+		BuyerID:    req.BuyerID,
+		TotalPrice: req.TotalPrice,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &UpdateOrderResponse{}, nil
+}
+
+func (s *Service) DeleteOrder(req *DeleteOrderRequest) (*DeleteOrderResponse, error) {
+	if err := s.repo.DeleteOrder(req.Id); err != nil {
+		return nil, err
+	}
+
+	return &DeleteOrderResponse{}, nil
 }
 
 func NewService(repo repository.Order) *Service {

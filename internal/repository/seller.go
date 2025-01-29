@@ -78,6 +78,18 @@ func (s SellerRepository) DeleteSeller(id int) error {
 	return nil
 }
 
+func (s SellerRepository) ListSellers() ([]domain.Seller, error) {
+	var sellers []domain.Seller
+	query := fmt.Sprintf("SELECT id, name, phone, created_at FROM %s", SellerTable)
+
+	err := s.db.Select(&sellers, query)
+	if err != nil {
+		return nil, fmt.Errorf("could not get seller: %v", err)
+	}
+
+	return sellers, nil
+}
+
 func NewSellerRepository(db *sqlx.DB) *SellerRepository {
 	return &SellerRepository{db: db}
 }

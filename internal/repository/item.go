@@ -12,6 +12,18 @@ type ItemRepository struct {
 	db *sqlx.DB
 }
 
+func (r *ItemRepository) ListItems() ([]domain.Item, error) {
+	var item []domain.Item
+	query := fmt.Sprintf("SELECT id, seller_id, name, description, price, created_at FROM %s", ItemTable)
+
+	err := r.db.Select(&item, query)
+	if err != nil {
+		return item, fmt.Errorf("could not get item: %v", err)
+	}
+
+	return item, nil
+}
+
 func (r *ItemRepository) CreateItem(data domain.Item) error {
 	query := fmt.Sprintf("INSERT INTO %s (name, description, price) VALUES ($1, $2, $3)", ItemTable)
 

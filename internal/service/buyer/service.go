@@ -57,6 +57,27 @@ func (s Service) DeleteBuyer(req *DeleteBuyerRequest) (*DeleteBuyerResponse, err
 	return &DeleteBuyerResponse{}, nil
 }
 
+func (s Service) ListBuyers(req *ListBuyersRequest) (*ListBuyersResponse, error) {
+	res, err := s.repo.ListBuyers()
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &ListBuyersResponse{
+		Buyers: make([]Buyer, len(res)),
+	}
+	for _, item := range res {
+		resp.Buyers = append(resp.Buyers, Buyer{
+			ID:        item.ID,
+			Name:      item.Name,
+			Phone:     item.Phone,
+			CreatedAt: item.CreatedAt,
+		})
+	}
+
+	return resp, nil
+}
+
 func NewService(repo repository.Buyer) *Service {
 	return &Service{repo: repo}
 }

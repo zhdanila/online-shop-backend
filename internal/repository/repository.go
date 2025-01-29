@@ -14,6 +14,7 @@ type Repository struct {
 
 type Buyer interface {
 	CreateBuyer(data domain.Buyer) error
+	ListBuyers() ([]domain.Buyer, error)
 	GetBuyer(id int) (domain.Buyer, error)
 	UpdateBuyer(id int, data domain.Buyer) error
 	DeleteBuyer(id int) error
@@ -22,6 +23,7 @@ type Buyer interface {
 type Item interface {
 	CreateItem(data domain.Item) error
 	GetItem(id int) (domain.Item, error)
+	ListItems() ([]domain.Item, error)
 	UpdateItem(id int, data domain.Item) error
 	DeleteItem(id int) error
 }
@@ -38,6 +40,7 @@ type Order interface {
 type Seller interface {
 	CreateSeller(data domain.Seller) error
 	GetSeller(id int) (domain.Seller, error)
+	ListSellers() ([]domain.Seller, error)
 	UpdateSeller(id int, data domain.Seller) error
 	DeleteSeller(id int) error
 }

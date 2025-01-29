@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"online-shop-backend/internal/domain"
+	item2 "online-shop-backend/internal/service/item"
 	"online-shop-backend/pkg/response"
+	"strconv"
 )
 
 func (h *Handler) createItem(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +26,14 @@ func (h *Handler) createItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = h.services.Item.CreateItem(item); err != nil {
+	req := &item2.CreateItemRequest{
+		SellerID:    item.SellerID,
+		Name:        item.Name,
+		Description: item.Description,
+		Price:       item.Price,
+	}
+
+	if _, err = h.services.Item.CreateItem(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -37,24 +46,47 @@ func (h *Handler) createItem(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) getItem(w http.ResponseWriter, r *http.Request) {
 	var (
-		err  error
-		id   int
-		item domain.Item
+		err error
 	)
 
-	id, ok := r.Context().Value("id").(int)
-	if !ok {
-		response.NewErrorResponse(w, http.StatusBadRequest, "item id not found in context")
+	id := r.PathValue("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if item, err = h.services.Item.GetItem(id); err != nil {
+	req := &item2.GetItemRequest{
+		Id: intId,
+	}
+
+	resp, err := h.services.Item.GetItem(req)
+	if err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(item); err != nil {
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+	}
+}
+
+func (h *Handler) listItems(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+	)
+
+	req := &item2.ListItemsRequest{}
+
+	resp, err := h.services.Item.ListItems(req)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}
 }
@@ -62,13 +94,13 @@ func (h *Handler) getItem(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 	var (
 		err  error
-		id   int
 		item domain.Item
 	)
 
-	id, ok := r.Context().Value("id").(int)
-	if !ok {
-		response.NewErrorResponse(w, http.StatusBadRequest, "item ID not found in context")
+	id := r.PathValue("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -82,7 +114,15 @@ func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = h.services.Item.UpdateItem(id, item); err != nil {
+	req := &item2.UpdateItemRequest{
+		Id:          intId,
+		SellerID:    item.SellerID,
+		Name:        item.Name,
+		Description: item.Description,
+		Price:       item.Price,
+	}
+
+	if _, err = h.services.Item.UpdateItem(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -96,16 +136,20 @@ func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) deleteItem(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		id  int
 	)
 
-	id, ok := r.Context().Value("id").(int)
-	if !ok {
-		response.NewErrorResponse(w, http.StatusBadRequest, "item ID not found in context")
+	id := r.PathValue("id")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.services.Item.DeleteItem(id); err != nil {
+	req := &item2.DeleteItemRequest{
+		Id: intId,
+	}
+
+	if _, err = h.services.Item.DeleteItem(req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}

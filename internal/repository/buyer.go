@@ -12,6 +12,18 @@ type BuyerRepository struct {
 	db *sqlx.DB
 }
 
+func (b BuyerRepository) ListBuyers() ([]domain.Buyer, error) {
+	var buyers []domain.Buyer
+	query := fmt.Sprintf("SELECT id, name, phone, created_at FROM %s", BuyerTable)
+
+	err := b.db.Select(&buyers, query)
+	if err != nil {
+		return nil, fmt.Errorf("could not get buyer: %v", err)
+	}
+
+	return buyers, nil
+}
+
 func (b BuyerRepository) CreateBuyer(data domain.Buyer) error {
 	query := fmt.Sprintf("INSERT INTO %s (name, phone) VALUES ($1, $2)", BuyerTable)
 

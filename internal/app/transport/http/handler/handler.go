@@ -23,17 +23,20 @@ func (h *Handler) InitRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.Handle("POST /seller", middleware.BasicAuth(http.HandlerFunc(h.createSeller)))
+	mux.Handle("GET /seller", middleware.BasicAuth(http.HandlerFunc(h.listSellers)))
 	mux.Handle("GET /seller/{id}", middleware.BasicAuth(http.HandlerFunc(h.getSeller)))
 	mux.Handle("PUT /seller/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateSeller)))
 	mux.Handle("DELETE /seller/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteSeller)))
 
 	mux.Handle("POST /item", middleware.BasicAuth(http.HandlerFunc(h.createItem)))
-	mux.Handle("GET /item/{id}/333", middleware.BasicAuth(http.HandlerFunc(h.getItem)))
+	mux.Handle("GET /item/{id}", middleware.BasicAuth(http.HandlerFunc(h.getItem)))
+	mux.Handle("GET /item", middleware.BasicAuth(http.HandlerFunc(h.listItems)))
 	mux.Handle("PUT /item/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateItem)))
 	mux.Handle("DELETE /item/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteItem)))
 
 	mux.Handle("POST /buyer", middleware.BasicAuth(http.HandlerFunc(h.createBuyer)))
 	mux.Handle("GET /buyer/{id}", middleware.BasicAuth(http.HandlerFunc(h.getBuyer)))
+	mux.Handle("GET /buyer", middleware.BasicAuth(http.HandlerFunc(h.listBuyers)))
 	mux.Handle("PUT /buyer/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateBuyer)))
 	mux.Handle("DELETE /buyer/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteBuyer)))
 
@@ -42,7 +45,6 @@ func (h *Handler) InitRoutes() *http.ServeMux {
 	mux.Handle("GET /order", middleware.BasicAuth(http.HandlerFunc(h.listOrders)))
 	mux.Handle("PUT /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.updateOrder)))
 	mux.Handle("DELETE /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteOrder)))
-	mux.Handle("POST /order/{id}", middleware.BasicAuth(http.HandlerFunc(h.deleteOrder)))
 	mux.Handle("POST /order/item", middleware.BasicAuth(http.HandlerFunc(h.addItemToOrder)))
 
 	return mux
