@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/go-playground/validator/v10"
 	"net/http"
+	"online-shop-backend/internal/app/transport/http/middleware"
 	"online-shop-backend/internal/service"
 )
 
@@ -21,7 +22,7 @@ func NewHandler(services *service.Service, validate *validator.Validate) *Handle
 func (h *Handler) InitRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /sign-up", h.signUp)
+	mux.Handle("/protected-endpoint", middleware.BasicAuth(http.HandlerFunc(h.handleProtectedEndpoint)))
 
 	return mux
 }
