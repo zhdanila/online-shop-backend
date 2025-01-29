@@ -1,32 +1,60 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
 	"online-shop-backend/internal/domain"
 )
+
+const ItemTable = "items"
 
 type ItemRepository struct {
 	db *sqlx.DB
 }
 
-func (i ItemRepository) CreateItem(data domain.Item) error {
-	//TODO implement me
-	panic("implement me")
+func (r *ItemRepository) CreateItem(data domain.Item) error {
+	query := fmt.Sprintf("INSERT INTO %s (name, description, price) VALUES ($1, $2, $3)", ItemTable)
+
+	_, err := r.db.Exec(query, data.Name, data.Description, data.Price)
+	if err != nil {
+		return fmt.Errorf("could not insert item: %v", err)
+	}
+
+	return nil
 }
 
-func (i ItemRepository) GetItem(id string) (domain.Item, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *ItemRepository) GetItem(id string) (domain.Item, error) {
+	var item domain.Item
+	query := fmt.Sprintf("SELECT id, seller_id, name, description, price, created_at FROM %s WHERE id = $1", ItemTable)
+
+	err := r.db.Get(&item, query, id)
+	if err != nil {
+		return item, fmt.Errorf("could not get item: %v", err)
+	}
+
+	return item, nil
 }
 
-func (i ItemRepository) UpdateItem(id string, data domain.Item) error {
-	//TODO implement me
-	panic("implement me")
+func (r *ItemRepository) UpdateItem(id string, data domain.Item) error {
+	query := fmt.Sprintf("UPDATE %s SET seller_id = $1, name = $2, description = $3, price = $4 WHERE id = $5", ItemTable)
+
+	_, err := r.db.Exec(query, data.SellerID, data.Name, data.Description, data.Price, id)
+	if err != nil {
+		return fmt.Errorf("could not update item: %v", err)
+	}
+
+	return nil
 }
 
-func (i ItemRepository) DeleteItem(id string) error {
-	//TODO implement me
-	panic("implement me")
+func (r *ItemRepository) DeleteItem(id string) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", ItemTable)
+
+	_, err := r.db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("could not delete item: %v", err)
+	}
+
+	return nil
 }
 
 func NewItemRepository(db *sqlx.DB) *ItemRepository {

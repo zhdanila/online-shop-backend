@@ -10,23 +10,19 @@ type Service struct {
 }
 
 func (s Service) CreateItem(data domain.Item) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.CreateItem(data)
 }
 
 func (s Service) GetItem(id string) (domain.Item, error) {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.GetItem(id)
 }
 
 func (s Service) UpdateItem(id string, data domain.Item) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.UpdateItem(id, data)
 }
 
 func (s Service) DeleteItem(id string) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.DeleteItem(id)
 }
 
 func NewService(repo repository.Item) *Service {

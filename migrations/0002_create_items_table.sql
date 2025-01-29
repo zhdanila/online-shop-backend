@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE products
+CREATE TABLE items
 (
     id          SERIAL PRIMARY KEY,
     seller_id   INT REFERENCES sellers (id) ON DELETE CASCADE,
@@ -13,5 +13,5 @@ CREATE TABLE products
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS items;
 -- +goose StatementEnd

@@ -2,11 +2,11 @@
 -- +goose StatementBegin
 CREATE TABLE order_items
 (
-    id         SERIAL PRIMARY KEY,
-    order_id   INT REFERENCES orders (id) ON DELETE CASCADE,
-    product_id INT REFERENCES products (id) ON DELETE CASCADE,
-    quantity   INT            NOT NULL,
-    price      DECIMAL(10, 2) NOT NULL
+    id       SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders (id) ON DELETE CASCADE,
+    item_id  INT REFERENCES items (id) ON DELETE CASCADE,
+    quantity INT            NOT NULL,
+    price    DECIMAL(10, 2) NOT NULL
 );
 -- +goose StatementEnd
 
