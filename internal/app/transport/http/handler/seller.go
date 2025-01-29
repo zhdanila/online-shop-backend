@@ -42,11 +42,7 @@ func (h *Handler) getSeller(w http.ResponseWriter, r *http.Request) {
 		seller domain.Seller
 	)
 
-	id, ok := r.Context().Value("id").(string)
-	if !ok {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, "user id not found in context")
-		return
-	}
+	id = r.PathValue("seller_id")
 
 	if seller, err = h.services.Seller.GetSeller(id); err != nil {
 		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -66,11 +62,7 @@ func (h *Handler) updateSeller(w http.ResponseWriter, r *http.Request) {
 		user domain.Seller
 	)
 
-	id, ok := r.Context().Value("id").(string)
-	if !ok {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, "seller ID not found in context")
-		return
-	}
+	id = r.PathValue("id")
 
 	if err = json.NewDecoder(r.Body).Decode(&user); err != nil {
 		pkg.NewErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -99,11 +91,7 @@ func (h *Handler) deleteSeller(w http.ResponseWriter, r *http.Request) {
 		id  string
 	)
 
-	id, ok := r.Context().Value("id").(string)
-	if !ok {
-		pkg.NewErrorResponse(w, http.StatusBadRequest, "seller ID not found in context")
-		return
-	}
+	id = r.PathValue("id")
 
 	if err = h.services.Seller.DeleteSeller(id); err != nil {
 		pkg.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
