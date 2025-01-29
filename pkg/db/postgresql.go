@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+	"online-shop-backend/internal/config"
 )
 
-type Config struct {
+type DBConfig struct {
 	Host     string
 	Port     string
 	Username string
@@ -15,9 +16,18 @@ type Config struct {
 	SSLMode  string
 }
 
-func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
+func NewPostgresDB(cnf *config.Config) (*sqlx.DB, error) {
+	dbConfig := DBConfig{
+		Host:     cnf.DBHost,
+		Port:     cnf.DBPort,
+		Username: cnf.DBUsername,
+		DBName:   cnf.DBName,
+		SSLMode:  cnf.DBSSLMode,
+		Password: cnf.DBPassword,
+	}
+
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
+		dbConfig.Host, dbConfig.Port, dbConfig.Username, dbConfig.DBName, dbConfig.Password, dbConfig.SSLMode))
 	if err != nil {
 		return nil, err
 	}

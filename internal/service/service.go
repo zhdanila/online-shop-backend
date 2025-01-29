@@ -1,6 +1,7 @@
 package service
 
 import (
+	"online-shop-backend/internal/domain"
 	"online-shop-backend/internal/repository"
 	"online-shop-backend/internal/service/auth"
 	"online-shop-backend/internal/service/buyer"
@@ -18,6 +19,7 @@ type Service struct {
 }
 
 type Auth interface {
+	SignUp(person domain.User) (int, error)
 }
 
 type Buyer interface {

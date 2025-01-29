@@ -3,8 +3,8 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	_ "github.com/lib/pq"
-	"github.com/samber/do/v2"
 	"go.uber.org/zap"
 	"online-shop-backend/internal/app/transport/http/handler"
 	"online-shop-backend/internal/config"
@@ -18,10 +18,6 @@ import (
 	"syscall"
 )
 
-type Bootstrap struct {
-	inj *do.RootScope
-}
-
 func Website() {
 	logger.InitLogger()
 
@@ -30,21 +26,16 @@ func Website() {
 		panic(err)
 	}
 
-	db, err := db.NewPostgresDB(db.Config{
-		Host:     cnf.DBHost,
-		Port:     cnf.DBPort,
-		Username: cnf.DBUsername,
-		DBName:   cnf.DBName,
-		SSLMode:  cnf.DBSSLMode,
-		Password: cnf.DBPassword,
-	})
+	validate := validator.New()
+
+	db, err := db.NewPostgresDB(cnf)
 	if err != nil {
 		zap.L().Fatal(fmt.Sprintf("error with connecting to database: %s", err.Error()))
 	}
 
 	repo := repository.NewRepository(db)
 	services := service.NewService(repo)
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(services, validate)
 	srv := new(server.Server)
 
 	go func() {

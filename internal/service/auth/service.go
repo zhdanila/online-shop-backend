@@ -1,11 +1,20 @@
 package auth
 
-import "online-shop-backend/internal/repository"
+import (
+	"online-shop-backend/internal/domain"
+	"online-shop-backend/internal/repository"
+	"online-shop-backend/pkg/strings"
+)
 
 type Service struct {
-	repo repository.Buyer
+	repo repository.Auth
 }
 
-func NewService(repo repository.Buyer) *Service {
+func NewService(repo repository.Auth) *Service {
 	return &Service{repo: repo}
+}
+
+func (a *Service) SignUp(person domain.User) (int, error) {
+	person.Password = strings.GeneratePasswordHash(person.Password)
+	return a.repo.SignUp(person)
 }

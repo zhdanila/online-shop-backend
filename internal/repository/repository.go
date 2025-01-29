@@ -1,6 +1,9 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"online-shop-backend/internal/domain"
+)
 
 type Repository struct {
 	Auth
@@ -11,6 +14,7 @@ type Repository struct {
 }
 
 type Auth interface {
+	SignUp(person domain.User) (int, error)
 }
 
 type Buyer interface {
