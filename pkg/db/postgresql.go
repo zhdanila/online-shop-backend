@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -25,6 +26,8 @@ func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	zap.L().Info("DB connected")
 
 	return db, nil
 }

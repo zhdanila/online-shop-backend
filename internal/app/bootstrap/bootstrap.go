@@ -3,10 +3,11 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	_ "github.com/lib/pq"
 	"github.com/samber/do/v2"
 	"go.uber.org/zap"
-	"online-shop-backend/internal/app"
-	"online-shop-backend/internal/app/interface/website/handler"
+	"online-shop-backend/internal/app/transport/http/handler"
+	"online-shop-backend/internal/config"
 	"online-shop-backend/internal/repository"
 	"online-shop-backend/internal/service"
 	"online-shop-backend/pkg/db"
@@ -24,7 +25,7 @@ type Bootstrap struct {
 func Website() {
 	logger.InitLogger()
 
-	cnf, err := app.NewConfig()
+	cnf, err := config.NewConfig()
 	if err != nil {
 		panic(err)
 	}
