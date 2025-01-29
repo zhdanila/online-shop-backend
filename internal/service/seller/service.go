@@ -10,8 +10,7 @@ type Service struct {
 }
 
 func (s Service) CreateSeller(data domain.Seller) error {
-	//TODO implement me
-	panic("implement me")
+	return s.repo.CreateSeller(data)
 }
 
 func (s Service) GetSeller(id string) (domain.Seller, error) {
