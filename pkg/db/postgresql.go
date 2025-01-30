@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"online-shop-backend/internal/config"
+	"time"
 )
 
 type DBConfig struct {
@@ -26,18 +27,23 @@ func NewPostgresDB(cnf *config.Config) (*sqlx.DB, error) {
 		Password: cnf.DBPassword,
 	}
 
-	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		dbConfig.Host, dbConfig.Port, dbConfig.Username, dbConfig.DBName, dbConfig.Password, dbConfig.SSLMode))
-	if err != nil {
-		return nil, err
+	var db *sqlx.DB
+	var err error
+
+	for i := 0; i < 10; i++ {
+		db, err = sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+			dbConfig.Host, dbConfig.Port, dbConfig.Username, dbConfig.DBName, dbConfig.Password, dbConfig.SSLMode))
+		if err == nil {
+			err = db.Ping()
+			if err == nil {
+				zap.L().Info("DB connected")
+				return db, nil
+			}
+		}
+
+		zap.L().Error("Database not ready, retrying in 5 seconds...", zap.Error(err))
+		time.Sleep(5 * time.Second)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-
-	zap.L().Info("DB connected")
-
-	return db, nil
+	return nil, fmt.Errorf("unable to connect to database after 10 attempts: %w", err)
 }
