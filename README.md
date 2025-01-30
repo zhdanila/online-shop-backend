@@ -77,9 +77,6 @@ application will be available at `http://localhost:8080`.
 All the available endpoints are listed in the online-shop.postman_collection.json file.
 
 ---
-Here's an improved version:
-
----
 
 The second part of the task, related to concatenation, can be found in the `cmd/concatenation/main.go` file.
 
