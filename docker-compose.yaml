@@ -46,9 +46,3 @@ services:
     volumes:
       - ./migrations:/app/migrations
     entrypoint: ["/app/entrypoint.sh"]
-
-  # Приклад залежного додатку
-  # my_app:
-  #  depends_on:
-  #    migrations:
-  #      condition: service_completed_successfully
