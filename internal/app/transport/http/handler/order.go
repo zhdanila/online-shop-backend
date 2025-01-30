@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"online-shop-backend/internal/domain"
 	"online-shop-backend/internal/service/order"
 	"online-shop-backend/pkg/response"
 	"strconv"
@@ -12,26 +11,21 @@ import (
 
 func (h *Handler) createOrder(w http.ResponseWriter, r *http.Request) {
 	var (
-		err      error
-		orderEnt domain.Order
+		err error
+		req order.CreateOrderRequest
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&orderEnt); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(orderEnt); err != nil {
+	if err = h.validator.Struct(req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	req := &order.CreateOrderRequest{
-		BuyerID:    orderEnt.BuyerID,
-		TotalPrice: orderEnt.TotalPrice,
-	}
-
-	if _, err = h.services.Order.CreateOrder(req); err != nil {
+	if _, err = h.services.Order.CreateOrder(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -91,34 +85,28 @@ func (h *Handler) listOrders(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) updateOrder(w http.ResponseWriter, r *http.Request) {
 	var (
-		err      error
-		orderEnt domain.Order
+		err error
+		req order.UpdateOrderRequest
 	)
 
 	id := r.PathValue("id")
-	intId, err := strconv.Atoi(id)
+	req.Id, err = strconv.Atoi(id)
 	if err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = json.NewDecoder(r.Body).Decode(&orderEnt); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(orderEnt); err != nil {
+	if err = h.validator.Struct(req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	req := &order.UpdateOrderRequest{
-		Id:         intId,
-		BuyerID:    orderEnt.BuyerID,
-		TotalPrice: orderEnt.TotalPrice,
-	}
-
-	if _, err = h.services.Order.UpdateOrder(req); err != nil {
+	if _, err = h.services.Order.UpdateOrder(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -150,34 +138,30 @@ func (h *Handler) deleteOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte(fmt.Sprintf("order with ID %s was deleted", id))); err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}
 }
 
 func (h *Handler) addItemToOrder(w http.ResponseWriter, r *http.Request) {
-	var orderItem domain.OrderItems
+	var (
+		err error
+		req order.AddItemToOrderRequest
+	)
 
-	err := json.NewDecoder(r.Body).Decode(&orderItem)
+	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	req := &order.AddItemToOrderRequest{
-		OrderID:  orderItem.OrderID,
-		ItemID:   orderItem.ItemID,
-		Quantity: orderItem.Quantity,
-		Price:    orderItem.Price,
-	}
-
-	if _, err = h.services.Order.AddItemToOrder(req); err != nil {
+	if _, err = h.services.Order.AddItemToOrder(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte(fmt.Sprintf("order with item was added"))); err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}

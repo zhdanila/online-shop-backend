@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"online-shop-backend/internal/domain"
+	"strings"
 )
 
 const BuyerTable = "buyers"
@@ -48,9 +49,27 @@ func (b BuyerRepository) GetBuyer(id int) (domain.Buyer, error) {
 }
 
 func (b BuyerRepository) UpdateBuyer(id int, data domain.Buyer) error {
-	query := fmt.Sprintf("UPDATE %s SET name = $1, phone = $2 WHERE id = $3", BuyerTable)
+	var setClauses []string
+	var params []interface{}
 
-	_, err := b.db.Exec(query, data.Name, data.Phone, id)
+	if data.Name != "" {
+		setClauses = append(setClauses, fmt.Sprintf("name = $%d", len(params)+1))
+		params = append(params, data.Name)
+	}
+
+	if data.Phone != "" {
+		setClauses = append(setClauses, fmt.Sprintf("phone = $%d", len(params)+1))
+		params = append(params, data.Phone)
+	}
+
+	if len(setClauses) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", BuyerTable, strings.Join(setClauses, ", "), len(params)+1)
+	params = append(params, id)
+
+	_, err := b.db.Exec(query, params...)
 	if err != nil {
 		return fmt.Errorf("could not update buyer: %v", err)
 	}

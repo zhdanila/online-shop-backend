@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"online-shop-backend/internal/domain"
 	"online-shop-backend/internal/service/seller"
 	"online-shop-backend/pkg/response"
 	"strconv"
@@ -12,26 +11,21 @@ import (
 
 func (h *Handler) createSeller(w http.ResponseWriter, r *http.Request) {
 	var (
-		err  error
-		user domain.Seller
+		err error
+		req seller.CreateSellerRequest
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(user); err != nil {
+	if err = h.validator.Struct(req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	req := &seller.CreateSellerRequest{
-		Name:  user.Name,
-		Phone: user.Phone,
-	}
-
-	if _, err = h.services.Seller.CreateSeller(req); err != nil {
+	if _, err = h.services.Seller.CreateSeller(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -91,8 +85,8 @@ func (h *Handler) listSellers(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) updateSeller(w http.ResponseWriter, r *http.Request) {
 	var (
-		err       error
-		sellerEnt domain.Seller
+		err error
+		req seller.UpdateSellerRequest
 	)
 
 	id := r.PathValue("id")
@@ -102,23 +96,19 @@ func (h *Handler) updateSeller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = json.NewDecoder(r.Body).Decode(&sellerEnt); err != nil {
+	req.Id = intId
+
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(sellerEnt); err != nil {
+	if err = h.validator.Struct(req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	req := &seller.UpdateSellerRequest{
-		Id:    intId,
-		Name:  sellerEnt.Name,
-		Phone: sellerEnt.Phone,
-	}
-
-	if _, err = h.services.Seller.UpdateSeller(req); err != nil {
+	if _, err = h.services.Seller.UpdateSeller(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}

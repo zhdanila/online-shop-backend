@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"online-shop-backend/internal/domain"
+	"strings"
 )
 
 const ItemTable = "items"
@@ -25,9 +26,9 @@ func (r *ItemRepository) ListItems() ([]domain.Item, error) {
 }
 
 func (r *ItemRepository) CreateItem(data domain.Item) error {
-	query := fmt.Sprintf("INSERT INTO %s (name, description, price) VALUES ($1, $2, $3)", ItemTable)
+	query := fmt.Sprintf("INSERT INTO %s (seller_id, name, description, price) VALUES ($1, $2, $3, $4)", ItemTable)
 
-	_, err := r.db.Exec(query, data.Name, data.Description, data.Price)
+	_, err := r.db.Exec(query, data.SellerID, data.Name, data.Description, data.Price)
 	if err != nil {
 		return fmt.Errorf("could not insert item: %v", err)
 	}
@@ -48,9 +49,37 @@ func (r *ItemRepository) GetItem(id int) (domain.Item, error) {
 }
 
 func (r *ItemRepository) UpdateItem(id int, data domain.Item) error {
-	query := fmt.Sprintf("UPDATE %s SET seller_id = $1, name = $2, description = $3, price = $4 WHERE id = $5", ItemTable)
+	var setClauses []string
+	var params []interface{}
 
-	_, err := r.db.Exec(query, data.SellerID, data.Name, data.Description, data.Price, id)
+	if data.SellerID != 0 {
+		setClauses = append(setClauses, fmt.Sprintf("seller_id = $%d", len(params)+1))
+		params = append(params, data.SellerID)
+	}
+
+	if data.Name != "" {
+		setClauses = append(setClauses, fmt.Sprintf("name = $%d", len(params)+1))
+		params = append(params, data.Name)
+	}
+
+	if data.Description != "" {
+		setClauses = append(setClauses, fmt.Sprintf("description = $%d", len(params)+1))
+		params = append(params, data.Description)
+	}
+
+	if data.Price != 0 {
+		setClauses = append(setClauses, fmt.Sprintf("price = $%d", len(params)+1))
+		params = append(params, data.Price)
+	}
+
+	if len(setClauses) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", ItemTable, strings.Join(setClauses, ", "), len(params)+1)
+	params = append(params, id)
+
+	_, err := r.db.Exec(query, params...)
 	if err != nil {
 		return fmt.Errorf("could not update item: %v", err)
 	}

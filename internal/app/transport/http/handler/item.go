@@ -4,36 +4,28 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"online-shop-backend/internal/domain"
-	item2 "online-shop-backend/internal/service/item"
+	"online-shop-backend/internal/service/item"
 	"online-shop-backend/pkg/response"
 	"strconv"
 )
 
 func (h *Handler) createItem(w http.ResponseWriter, r *http.Request) {
 	var (
-		err  error
-		item domain.Item
+		err error
+		req item.CreateItemRequest
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&item); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(item); err != nil {
+	if err = h.validator.Struct(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	req := &item2.CreateItemRequest{
-		SellerID:    item.SellerID,
-		Name:        item.Name,
-		Description: item.Description,
-		Price:       item.Price,
-	}
-
-	if _, err = h.services.Item.CreateItem(req); err != nil {
+	if _, err = h.services.Item.CreateItem(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -56,7 +48,7 @@ func (h *Handler) getItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := &item2.GetItemRequest{
+	req := &item.GetItemRequest{
 		Id: intId,
 	}
 
@@ -77,7 +69,7 @@ func (h *Handler) listItems(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	req := &item2.ListItemsRequest{}
+	req := &item.ListItemsRequest{}
 
 	resp, err := h.services.Item.ListItems(req)
 	if err != nil {
@@ -93,8 +85,8 @@ func (h *Handler) listItems(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 	var (
-		err  error
-		item domain.Item
+		err error
+		req item.UpdateItemRequest
 	)
 
 	id := r.PathValue("id")
@@ -104,25 +96,19 @@ func (h *Handler) updateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = json.NewDecoder(r.Body).Decode(&item); err != nil {
+	req.Id = intId
+
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err = h.validator.Struct(item); err != nil {
+	if err = h.validator.Struct(req); err != nil {
 		response.NewErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	req := &item2.UpdateItemRequest{
-		Id:          intId,
-		SellerID:    item.SellerID,
-		Name:        item.Name,
-		Description: item.Description,
-		Price:       item.Price,
-	}
-
-	if _, err = h.services.Item.UpdateItem(req); err != nil {
+	if _, err = h.services.Item.UpdateItem(&req); err != nil {
 		response.NewErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -145,7 +131,7 @@ func (h *Handler) deleteItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := &item2.DeleteItemRequest{
+	req := &item.DeleteItemRequest{
 		Id: intId,
 	}
 
@@ -154,7 +140,7 @@ func (h *Handler) deleteItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte(fmt.Sprintf("item with ID %s was deleted", id))); err != nil {
 		http.Error(w, "Failed to write response", http.StatusInternalServerError)
 	}

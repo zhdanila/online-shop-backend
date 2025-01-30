@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"online-shop-backend/internal/domain"
+	"strings"
 )
 
 const OrderTable = "orders"
@@ -66,12 +67,31 @@ func (r *OrderRepository) ListOrders() ([]domain.Order, error) {
 }
 
 func (r *OrderRepository) UpdateOrder(id int, order domain.Order) error {
-	query := fmt.Sprintf("UPDATE %s SET buyer_id = $1, total_price = $2 WHERE id = $3", OrderTable)
+	var setClauses []string
+	var params []interface{}
 
-	_, err := r.db.Exec(query, order.BuyerID, order.TotalPrice, id)
+	if order.BuyerID != 0 {
+		setClauses = append(setClauses, fmt.Sprintf("buyer_id = $%d", len(params)+1))
+		params = append(params, order.BuyerID)
+	}
+
+	if order.TotalPrice != 0 {
+		setClauses = append(setClauses, fmt.Sprintf("total_price = $%d", len(params)+1))
+		params = append(params, order.TotalPrice)
+	}
+
+	if len(setClauses) == 0 {
+		return fmt.Errorf("no fields to update")
+	}
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", OrderTable, strings.Join(setClauses, ", "), len(params)+1)
+	params = append(params, id)
+
+	_, err := r.db.Exec(query, params...)
 	if err != nil {
 		return fmt.Errorf("could not update order: %v", err)
 	}
+
 	return nil
 }
 

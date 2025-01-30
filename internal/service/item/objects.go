@@ -38,9 +38,9 @@ type ListItemsResponse struct {
 type UpdateItemRequest struct {
 	Id          int     `json:"id"`
 	SellerID    int     `json:"seller_id,omitempty"`
-	Name        string  `json:"name,omitempty" validate:"min=1,max=255"`
+	Name        string  `json:"name,omitempty" validate:"max=255"`
 	Description string  `json:"description,omitempty"`
-	Price       float64 `json:"price,omitempty" validate:"required"`
+	Price       float64 `json:"price,omitempty"`
 }
 
 type UpdateItemResponse struct{}
