@@ -1,3 +1,6 @@
+
+---
+
 # Online Store Project
 
 This project is a simple implementation of an online store using Go. It includes the following:
@@ -6,16 +9,19 @@ This project is a simple implementation of an online store using Go. It includes
 - **HTTP API** with basic authentication to manage CRUD operations for entities.
 - **Docker** and **Docker Compose** to run the Go application and PostgreSQL database together.
 
+> **Note:** The API endpoints are protected by Basic Auth. Use the following credentials to access the endpoints:
+>
+> - **Username:** `user`
+> - **Password:** `password`
+
 ---
 
 ## Technologies
 
 - **Go (Golang)**: A statically typed, compiled language used for building the backend server.
 - **PostgreSQL**: A powerful relational database used for storing application data.
-- **Docker**: A platform for developing, shipping, and running applications in containers, ensuring consistency across
-  environments.
-- **Docker Compose**: A tool for defining and running multi-container applications, used here for running the Go server
-  and PostgreSQL database.
+- **Docker**: A platform for developing, shipping, and running applications in containers, ensuring consistency across environments.
+- **Docker Compose**: A tool for defining and running multi-container applications, used here for running the Go server and PostgreSQL database.
 
 ## Dependencies
 
@@ -28,9 +34,7 @@ This project is a simple implementation of an online store using Go. It includes
 
 ### 1. **Set Environment Variables**
 
-Before running the service, make sure to create a .env file in the root directory of the project. You can use the
-example file env.default to set the necessary environment variables. Copy the contents of env.default into a new .env
-file, and update the variables as needed for your environment.
+Before running the service, make sure to create a `.env` file in the root directory of the project. You can use the example file `env.default` to set the necessary environment variables. Copy the contents of `env.default` into a new `.env` file, and update the variables as needed for your environment.
 
 ### 2. **Start the Application**
 
@@ -40,7 +44,7 @@ To start the Go application, run the following command:
 make up
 ```
 
-This command will run the Go HTTP server:
+This command will run the Go HTTP server.
 
 ### 3. **Migrate Database Up**
 
@@ -49,9 +53,6 @@ To apply database migrations (moving the database schema forward), use the follo
 ```bash
 make migrate-up
 ```
-
-Make sure the environment variables (`DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSLMODE`) are
-correctly set in the `.env` file.
 
 ### 4. **Reset Migrations (Migrate Down)**
 
@@ -69,12 +70,11 @@ To build and run the application and database with Docker Compose, use the follo
 make docker-build
 ```
 
-This command will build and start the application and PostgreSQL database in their respective containers, and the
-application will be available at `http://localhost:8080`.
+This command will build and start the application and PostgreSQL database in their respective containers, and the application will be available at `http://localhost:8080`.
 
 ---
 
-All the available endpoints are listed in the online-shop.postman_collection.json file.
+All the available endpoints are listed in the `online-shop.postman_collection.json` file.
 
 ---
 
